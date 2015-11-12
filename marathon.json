@@ -8,9 +8,6 @@
           "cpus": 0.2,
           "mem": 500,
           "instances": 3,
-          "ports": [
-            80
-          ],
           "requirePorts": true,
           "container": {
             "docker": {
@@ -18,9 +15,9 @@
               "network": "BRIDGE",
 		"portMappings": [
 		  {
-		    "containerPort": 3000,
+		    "containerPort": 80,
 		    "hostPort": 80,
-		    "servicePort": 3000,
+		    "servicePort": 80,
 		    "protocol": "tcp"
 		  }
 		],
