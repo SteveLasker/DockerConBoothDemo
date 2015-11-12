@@ -1,8 +1,8 @@
 imageName="dockerconboothdemo_image"
 containerPort=3000
-dockerHostName="default"
 publicPort=8080
-
+operation=$1
+environment=$2
 # Kills all running containers of an image and then removes them.
 cleanAll () {
     # List all running containers that use $imageName, kill them and then remove them.
@@ -16,16 +16,47 @@ buildImage () {
     docker build -t $imageName .
 }
 
-# Runs the container.
-runContainer () {
+composeContainer () {
     # Check if container is already running, stop it and run a new one.
-    docker kill $(docker ps -a | awk '{ print $1,$2 }' | grep $imageName | awk '{ print $1}') > /dev/null 2>&1;
-
-    # Create a container from the image.
-    docker run -di -p $publicPort:$containerPort $imageName
+    #docker kill $(docker ps -a | awk '{ print $1,$2 }' | grep $imageName | awk '{ print $1}') > /dev/null 2>&1;
+    case "$environment" in
+      "dev")
+          echo "Composing Dev Containers"
+          # Check if container is already running, stop it and run a new one.
+          docker-compose -f docker-compose.yml -f docker-compose.dev.yml kill
+          # Create a container from the image.
+          # --force-recreate 
+          docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate
+          ;;
+      "azure")
+          echo "Composing Azure Containers"
+          # Check if container is already running, stop it and run a new one.
+          docker-compose -f docker-compose.yml -f docker-compose.azure.yml kill
+          # Create a container from the image.
+          # --force-recreate 
+          docker-compose -f docker-compose.yml -f docker-compose.azure.yml up -d --force-recreate
+          ;;
+      *)
+          ;;
+    esac
 
     # Open the site.
-    open "http://$(docker-machine ip $dockerHostName):$publicPort"
+    open "http://$(docker-machine ip $(docker-machine active)):$publicPort"
+}
+printParams () {
+  echo "foo"
+  echo $operation
+  echo $environment
+}
+# Runs the container.
+runContainer () {
+  # Check if container is already running, stop it and run a new one.
+  docker kill $(docker ps -a | awk '{ print $1,$2 }' | grep $imageName | awk '{ print $1}') > /dev/null 2>&1;
+  # Create a container from the image.
+  #docker run -di -p $publicPort:$containerPort $imageName
+  docker run -di -p $publicPort:$containerPort -v `pwd`:/src $imageName
+  # Open the site.
+  open "http://$(docker-machine ip $(docker-machine active)):$publicPort"
 }
 
 # Shows the usage for the script.
@@ -47,10 +78,15 @@ showUsage () {
 }
 
 if [ $# -eq 0 ]; then
-  buildImage
-  runContainer
+  showUsage
 else
   case "$1" in
+      "print")
+             printParams
+             ;;
+      "compose")
+             composeContainer
+             ;;
       "build")
              buildImage
              ;;

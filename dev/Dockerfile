@@ -12,9 +12,10 @@ WORKDIR /src
 
 # Expose the port on the container.
 EXPOSE 3000
+RUN npm install nodemon -g
 
 # Install the dependencies.
 RUN npm install
 
 # Run the app.
-CMD ["node", "./bin/www"]
+CMD ["nodemon"]
