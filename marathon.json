@@ -1,0 +1,36 @@
+{
+  "id": "vscode",
+  "groups": [
+    {
+      "apps": [
+        {
+          "id": "web",
+          "cpus": 0.2,
+          "mem": 500,
+          "instances": 1,
+          "ports": [
+            80
+          ],
+          "requirePorts": true,
+          "container": {
+            "docker": {
+              "image": "adtd/vcs_demo_web",
+              "network": "BRIDGE",
+		"portMappings": [
+		  {
+		    "containerPort": 3000,
+		    "hostPort": 80,
+		    "servicePort": 3000,
+		    "protocol": "tcp"
+		  }
+		],
+              "forcePullImage": true
+            },
+            "type": "DOCKER"
+          }
+        }
+      ],
+      "id": "demo"
+    }
+  ]
+}
