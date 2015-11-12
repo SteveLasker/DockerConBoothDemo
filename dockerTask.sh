@@ -1,6 +1,6 @@
 imageName="dockerconboothdemo_image"
 containerPort=3000
-publicPort=8080
+publicPort=3000
 operation=$1
 environment=$2
 # Kills all running containers of an image and then removes them.
@@ -17,8 +17,6 @@ buildImage () {
 }
 
 composeContainer () {
-    # Check if container is already running, stop it and run a new one.
-    #docker kill $(docker ps -a | awk '{ print $1,$2 }' | grep $imageName | awk '{ print $1}') > /dev/null 2>&1;
     case "$environment" in
       "dev")
           echo "Composing Dev Containers"
@@ -27,27 +25,29 @@ composeContainer () {
           # Create a container from the image.
           # --force-recreate 
           docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate
+          publicPort=3000
           ;;
-      "azure")
+      "staging")
           echo "Composing Azure Containers"
           # Check if container is already running, stop it and run a new one.
           docker-compose -f docker-compose.yml -f docker-compose.azure.yml kill
           # Create a container from the image.
           # --force-recreate 
           docker-compose -f docker-compose.yml -f docker-compose.azure.yml up -d --force-recreate
+          publicPort=8081
           ;;
       *)
+          environment="dev"
+          composeContainer
+          return
           ;;
     esac
 
     # Open the site.
+    #TODO use docker ps w/formatting to get the port from the running container
     open "http://$(docker-machine ip $(docker-machine active)):$publicPort"
 }
-printParams () {
-  echo "foo"
-  echo $operation
-  echo $environment
-}
+
 # Runs the container.
 runContainer () {
   # Check if container is already running, stop it and run a new one.
@@ -81,9 +81,6 @@ if [ $# -eq 0 ]; then
   showUsage
 else
   case "$1" in
-      "print")
-             printParams
-             ;;
       "compose")
              composeContainer
              ;;
