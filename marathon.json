@@ -14,7 +14,7 @@
           "requirePorts": true,
           "container": {
             "docker": {
-              "image": "adtd/vcs_demo_web",
+              "image": "adtd/vsc_demo_web",
               "network": "BRIDGE",
 		"portMappings": [
 		  {
