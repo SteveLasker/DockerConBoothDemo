@@ -1,4 +1,4 @@
-imageName="dockerconboothdemo_image"
+imageName="dockerconboothdemo"
 containerPort=3000
 publicPort=3000
 operation=$1
@@ -20,19 +20,16 @@ composeContainer () {
     case "$environment" in
       "dev")
           echo "Composing Dev Containers"
+
           # Check if container is already running, stop it and run a new one.
           docker-compose -f docker-compose.yml -f docker-compose.dev.yml kill
-          # Create a container from the image.
-          # --force-recreate 
           docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate
-          publicPort=3000
           ;;
       "staging")
           echo "Composing Staging Containers"
+
           # Check if container is already running, stop it and run a new one.
           docker-compose -f docker-compose.yml -f docker-compose.staging.yml kill
-          # Create a container from the image.
-          # --force-recreate 
           docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d --force-recreate
           publicPort=8081
           ;;
